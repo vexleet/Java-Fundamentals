@@ -1,28 +1,66 @@
+import java.util.EmptyStackException;
 import java.util.Scanner;
-//75/100
+import java.util.Stack;
+
 public class BalancedParentheses {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
         String input = scanner.nextLine();
 
-        if(input.length() % 2 != 0){
-            checkForBalancedParentheses(input, input.length() / 2 + 1);
-        }
-        else {
-            checkForBalancedParentheses(input, input.length() / 2);
-        }
+        checkForBalancedParentheses(input);
 
     }
 
-    public static void checkForBalancedParentheses(String array, int length){
-        for (int i = 0; i < length; i++) {
-            String firstParanthes = Character.toString(array.charAt(i));
-            String secondParanthes = Character.toString(array.charAt(array.length() - 1 - i));
+    public static void checkForBalancedParentheses(String array){
+        Stack<String> stack = new Stack<>();
+        boolean balancedParentheses = true;
 
-            if (!(firstParanthes.equals("{") && secondParanthes.equals("}"))
-                    && !(firstParanthes.equals("[") && secondParanthes.equals("]")) &&
-                    !(firstParanthes.equals("(") && secondParanthes.equals(")"))) {
+        for (int i = 0; i < array.length(); i++) {
+            String currentParentheses = Character.toString(array.charAt(i));
+
+            if(currentParentheses.equals("(")
+                    || currentParentheses.equals("[") || currentParentheses.equals("{")){
+                stack.add(currentParentheses);
+            }
+            else if(currentParentheses.equals(")")){
+                try {
+                    String lastParentheses = stack.pop();
+
+                    if (!lastParentheses.equals("(")) {
+                        balancedParentheses = false;
+                    }
+                }
+                catch (EmptyStackException e){
+                    balancedParentheses = false;
+                }
+            }
+            else if(currentParentheses.equals("]")){
+                try {
+                    String lastParentheses = stack.pop();
+
+                    if (!lastParentheses.equals("[")) {
+                        balancedParentheses = false;
+                    }
+                }
+                catch (EmptyStackException e){
+                    balancedParentheses = false;
+                }
+            }
+            else if(currentParentheses.equals("}")){
+                try {
+                    String lastParentheses = stack.pop();
+
+                    if (!lastParentheses.equals("{")) {
+                        balancedParentheses = false;
+                    }
+                }
+                catch (EmptyStackException e){
+                    balancedParentheses = false;
+                }
+            }
+
+            if(!balancedParentheses){
                 System.out.println("NO");
                 return;
             }
