@@ -1,11 +1,8 @@
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Scanner;
-import java.util.TreeMap;
+import java.util.*;
 
 public class PopulationCounter {
     public static void main(String[] args) {
-        HashMap<String, HashMap<String, Long>> countries = new HashMap<>();
+        Map<String, Map<String, Long>> countries = new LinkedHashMap<>();
 
         Scanner scanner = new Scanner(System.in);
         String[] input = scanner.nextLine().split("\\|");
@@ -16,24 +13,23 @@ public class PopulationCounter {
             long population = Long.parseLong(input[2]);
 
             if(countries.containsKey(country) == false){
-                countries.put(country, new HashMap<>());
+                countries.put(country, new LinkedHashMap<>());
             }
 
-            if(countries.get(country).containsKey(city) == false){
-                countries.get(country).put(city, population);
-            }
-            else{
-                countries.get(country).put(city, countries.get(country).get(city) + population);
-            }
+            countries.get(country).put(city, population);
 
             input = scanner.nextLine().split("\\|");
         }
 
-        var sortCountries = new TreeMap(Collections.reverseOrder());
-        sortCountries.putAll(countries);
-
-        for (Object state : sortCountries.keySet()) {
-            System.out.println();
-        }
+        countries.entrySet().stream()
+                .sorted((country1, country2) -> country2.getValue().values().stream().reduce(0L, Long::sum)
+                        .compareTo(country1.getValue().values().stream().reduce(0L, Long::sum)))
+                .forEach(country -> {
+                    System.out.printf("%s (total population: %d)%n", country.getKey(),
+                            country.getValue().values().stream().reduce(0L, Long::sum));
+                    country.getValue().entrySet().stream()
+                            .sorted((city1, city2) -> city2.getValue().compareTo(city1.getValue()))
+                            .forEach(city -> System.out.printf("=>%s: %d%n", city.getKey(), city.getValue()));
+                });
     }
 }
