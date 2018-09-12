@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.TreeMap;
+import java.util.*;
 
 public class LogsAggregator {
     public static void main(String[] args) {
@@ -32,8 +29,30 @@ public class LogsAggregator {
 
                 for (Long user : logs.get(currentUser).keySet()) {
                     if(check == false){
+                        keys += logs.get(currentUser).ceilingKey(user);
+                        currentKey = logs.get(currentUser).ceilingKey(user);
+                        check = true;
+                    }
+                    for (String ip : logs.get(currentUser).get(user)) {
+                        values.add(ip);
                     }
                 }
+
+                logs.get(currentUser).remove(currentKey);
+                logs.get(currentUser).put(keys, values);
+            }
+        }
+
+
+        List<String> list =  new ArrayList<>(logs.keySet());
+        Collections.sort(list);
+
+        for (String s : list) {
+            var test = logs.get(s).values().iterator().next();
+            var getIps = new TreeSet<>(logs.get(s).values().iterator().next());
+
+            for (Long aLong : logs.get(s).keySet()) {
+                System.out.printf("%s: %s [%s]%n", s, logs.get(s).ceilingKey(aLong), String.join(", ", getIps));
             }
         }
     }
